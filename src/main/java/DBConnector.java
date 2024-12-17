@@ -117,12 +117,14 @@ public class DBConnector {
         return null;
     }
 
-    public Person geMaxGiver() {
+    public List<Person> geMaxGiver() {
         try {
-            String view = "select SUM(hp.points) as suma_puntos, hp.giver as personaje FROM HousePoint hp GROUP BY hp.giver";
+            /*String view = "select SUM(hp.points) as suma_puntos, hp.giver as personaje FROM HousePoint hp GROUP BY hp.giver";
             Query query = this.em.createQuery("SELECT personaje from (" + view + ") WHERE " +
                     "suma_puntos = (SELECT MAX(suma_puntos) from (" + view + "))");
-            return (Person) query.getSingleResult();
+            return (Person) query.getSingleResult();*/
+            Query query = this.em.createNamedQuery("HousePoint.findMaxGiver");
+            return query.getResultList();
         } catch (IllegalArgumentException e) {
             System.out.println("Error de argumento: " + e.getMessage());
         } catch (HibernateException e) {
@@ -131,12 +133,14 @@ public class DBConnector {
         return null;
     }
 
-    public Person geMaxReceiver() {
+    public List<Person> geMaxReceiver() {
         try {
-            String view = "select SUM(hp.points) as suma_puntos, hp.receiver as personaje FROM HousePoint hp GROUP BY hp.receiver";
+            /*String view = "select SUM(hp.points) as suma_puntos, hp.receiver as personaje FROM HousePoint hp GROUP BY hp.receiver";
             Query query = this.em.createQuery("SELECT personaje from (" + view + ") WHERE " +
                     "suma_puntos = (SELECT MAX(suma_puntos) from (" + view + "))");
-            return (Person) query.getSingleResult();
+            return (Person) query.getSingleResult();*/
+            Query query = this.em.createNamedQuery("HousePoint.findMaxReceiver");
+            return query.getResultList();
         } catch (IllegalArgumentException e) {
             System.out.println("Error de argumento: " + e.getMessage());
         } catch (HibernateException e) {

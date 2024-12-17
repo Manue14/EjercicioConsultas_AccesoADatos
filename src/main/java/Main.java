@@ -19,12 +19,16 @@ public class Main {
             }
 
             System.out.println();
-            System.out.println("----Max Giver----");
-            System.out.println(conn.geMaxGiver().getFirstName());
+            System.out.println("----Max Giver(s)----");
+            for (Person p : conn.geMaxGiver()) {
+                System.out.println(p.getFirstName());
+            }
 
             System.out.println();
-            System.out.println("----Max Receiver----");
-            System.out.println(conn.geMaxReceiver().getFirstName());
+            System.out.println("----Max Receiver(s)----");
+            for (Person p : conn.geMaxReceiver()) {
+                System.out.println(p.getFirstName());
+            }
         } catch (HibernateException e) {
             System.out.println("No se pudo establecer conexión a la base de datos");
         }

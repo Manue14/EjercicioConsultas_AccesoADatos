@@ -4,6 +4,14 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "house_points")
+@NamedQueries({
+        @NamedQuery(name="HousePoint.findMaxGiver",
+                query="SELECT h.giver FROM HousePoint h GROUP BY h.giver HAVING SUM(h.points) = " +
+                        "(SELECT MAX(total) FROM (SELECT SUM(hv.points) AS total FROM HousePoint hv GROUP BY hv.giver))"),
+        @NamedQuery(name="HousePoint.findMaxReceiver",
+                query="SELECT h.receiver FROM HousePoint h GROUP BY h.receiver HAVING SUM(h.points) = " +
+                        "(SELECT MAX(total) FROM (SELECT SUM(hv.points) AS total FROM HousePoint hv GROUP BY hv.receiver))")
+})
 public class HousePoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
