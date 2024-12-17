@@ -29,6 +29,19 @@ public class Main {
             for (Person p : conn.geMaxReceiver()) {
                 System.out.println(p.getFirstName());
             }
+
+            System.out.println();
+            conn.deletePersonByName("Shambala");
+
+            System.out.println();
+            List<Person> persons = conn.getPersonsByHouse("Hufflepuff");
+            if (persons == null || persons.isEmpty()) {
+                System.out.println("No se encontraron personajes");
+            } else {
+                for (Person p : persons) {
+                    System.out.println(p.getFirstName() + " " + p.getLastName());
+                }
+            }
         } catch (HibernateException e) {
             System.out.println("No se pudo establecer conexión a la base de datos");
         }

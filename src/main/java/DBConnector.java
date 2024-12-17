@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.HibernateException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DBConnector {
@@ -144,6 +145,79 @@ public class DBConnector {
         } catch (IllegalArgumentException e) {
             System.out.println("Error de argumento: " + e.getMessage());
         } catch (HibernateException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public void deletePersonByName(String name) {
+        try {
+            if (name == null) {
+                throw new IllegalArgumentException("El nombre no puede ser nulo");
+            }
+            Person person = getPerson(name);
+            if (person == null) {
+                throw new IllegalArgumentException("No se pudo encontrar el personaje a borrar");
+            }
+            this.em.getTransaction().begin();
+            Query query = this.em.createQuery("DELETE FROM Person p WHERE p.id = :id");
+            query.setParameter("id", person.getId());
+            int affected_rows = query.executeUpdate();
+            if (affected_rows == 1) {
+                this.em.getTransaction().commit();
+                System.out.println("Personaje borrado exitosamente");
+            } else {
+                throw new HibernateException("No se pudo borrar el personaje");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (HibernateException e) {
+            System.out.println(e.getMessage());
+            this.em.getTransaction().rollback();
+        }
+    }
+
+    public Person getPerson(String name) {
+        try {
+            if (name == null) {
+                throw new IllegalArgumentException("El nombre no puede ser nulo");
+            }
+            Person person = new Person();
+            Query query = this.em.createQuery("SELECT p FROM Person p WHERE p.firstName = :name");
+            query.setParameter("name", name);
+            person = (Person) query.getSingleResult();
+            return person;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error de argumento: " + e.getMessage());
+        } catch (NonUniqueResultException e) {
+            System.out.println("Se obtuvieron más resultados de los esperados");
+        } catch (NoResultException e) {
+            System.out.println("El personaje con nombre: " + name + " no existe");
+        } catch (HibernateException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public List<Person> getPersonsByHouse(String houseName) {
+        try {
+            if (houseName == null) {
+                throw new IllegalArgumentException("El nombre no puede ser nulo");
+            }
+            Query query = this.em.createNativeQuery(
+                    "SELECT person.id " +
+                            "FROM person INNER JOIN house ON person.house_id = house.id " +
+                            "WHERE house.name = ?"
+            );
+            List<Person> persons = new ArrayList<>();
+            query.setParameter(1, houseName);
+            for (Object o : query.getResultList()) {
+                persons.add(this.em.find(Person.class, (Integer) o));
+            }
+            return persons;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error de argumento: " + e.getMessage());
+        } catch(Exception e) {
             System.out.println(e.getMessage());
         }
         return null;
