@@ -222,4 +222,49 @@ public class DBConnector {
         }
         return null;
     }
+
+    public HashMap<String, List<Person>> getCoursesWithStudents() {
+        HashMap<String, List<Person>> courseMap = new HashMap<>();
+        try {
+            Query query = this.em.createNativeQuery("SELECT name, person_enrollment FROM course " +
+                    "LEFT OUTER JOIN enrollment ON course.id = enrollment.course_enrollment", Tuple.class);
+            List<Tuple> tuples = query.getResultList();
+            tuples.forEach(tuple -> {
+                if (!courseMap.containsKey(tuple.get(0))) {
+                    courseMap.put(tuple.get(0).toString(), new ArrayList<Person>());
+                }
+                if (tuple.get(1) != null) {
+                    Person person = this.em.find(Person.class, tuple.get(1));
+                    courseMap.get(tuple.get(0).toString()).add(person);
+                }
+            });
+            return courseMap;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return courseMap;
+    }
+
+    public List<Person> getPersonsByPoints(int points) {
+        List<Person> persons = new ArrayList<>();
+        try {
+            Query query = this.em.createNativeQuery("select person.id from person " +
+                    "where (select sum(points) from house_points where house_points.receiver = person.id) >= ?");
+            query.setParameter(1, points);
+            if (query.getResultList().size() > 0) {
+                for (Object o : query.getResultList()) {
+                    Person person = this.em.find(Person.class, (Integer) o);
+                    persons.add(person);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return persons;
+    }
+
+    /*
+    select person.id from person
+        where (select sum(points) from house_points where house_points.receiver = person.id) > 50;
+    */
 }

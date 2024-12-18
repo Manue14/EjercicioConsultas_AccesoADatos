@@ -4,6 +4,7 @@ import entities.Houses;
 import entities.Person;
 import org.hibernate.HibernateException;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Main {
@@ -39,6 +40,26 @@ public class Main {
                 System.out.println("No se encontraron personajes");
             } else {
                 for (Person p : persons) {
+                    System.out.println(p.getFirstName() + " " + p.getLastName());
+                }
+            }
+
+            System.out.println();
+            HashMap<String, List<Person>> courseMap = conn.getCoursesWithStudents();
+            for (String key : courseMap.keySet()) {
+                System.out.println(key + ":");
+                for (Person p : courseMap.get(key)) {
+                    System.out.println("\t" + p.getFirstName() + " " + p.getLastName());
+                }
+                System.out.println();
+            }
+
+            System.out.println();
+            List<Person> persons_list = conn.getPersonsByPoints(100);
+            if (persons_list.isEmpty()) {
+                System.out.println("No se encontraron personajes");
+            } else {
+                for (Person p : persons_list) {
                     System.out.println(p.getFirstName() + " " + p.getLastName());
                 }
             }
